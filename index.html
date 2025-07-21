@@ -11,13 +11,70 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <!-- Razorpay Checkout SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- Firebase SDKs for Auth -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // Firebase configuration is provided by the environment
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // Global Firebase and Auth instances
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.googleAuthProvider = provider;
+        
+        // Listen for auth state changes
+        onAuthStateChanged(auth, async (user) => {
+            const authStatusDiv = document.getElementById('auth-status');
+            const authButton = document.getElementById('auth-button');
+
+            if (user) {
+                // User is signed in
+                authStatusDiv.textContent = `Welcome, ${user.displayName || user.email}!`;
+                authButton.textContent = 'Logout';
+                authButton.onclick = async () => {
+                    try {
+                        await signOut(auth);
+                        showToast('Logged out successfully!');
+                    } catch (error) {
+                        console.error('Error logging out:', error);
+                        showToast('Error logging out. Please try again.');
+                    }
+                };
+            } else {
+                // User is signed out
+                authStatusDiv.textContent = 'Not logged in';
+                authButton.textContent = 'Login with Google';
+                authButton.onclick = async () => {
+                    try {
+                        // Sign in with custom token if available, otherwise anonymously
+                        if (typeof __initial_auth_token !== 'undefined') {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                        // Then proceed with Google sign-in
+                        await signInWithPopup(auth, provider);
+                        showToast('Logged in with Google!');
+                    } catch (error) {
+                        console.error('Error during Google login:', error);
+                        showToast('Error logging in with Google. Please try again.');
+                    }
+                };
+            }
+        });
+    </script>
     <script type="text/javascript">
         (function() {
             // Initialize EmailJS with your Public Key
             // IMPORTANT: Replace "YOUR_EMAILJS_PUBLIC_KEY" with your actual EmailJS Public Key
             // You can find this in your EmailJS account dashboard under Account -> API Keys
             emailjs.init({
-                publicKey: "6AqidffnKSYnoEckD", // <<< REPLACE THIS WITH YOUR ACTUAL PUBLIC KEY
+                publicKey: "6AqidffnKSYnoEckD", // <<< REPLACE THIS WITH YOUR ACTUAL PUBLIC KEY IF IT CHANGES
             });
         })();
     </script>
@@ -212,9 +269,10 @@
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300" data-page="products">Products</a>
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300" data-page="faq">FAQ</a>
             </div>
-            <!-- Cart Button (Auth elements removed) -->
+            <!-- Auth and Cart Buttons -->
             <div class="flex items-center space-x-4">
-                <!-- Removed auth-status div and auth-button -->
+                <div id="auth-status" class="text-sm text-gray-400">Not logged in</div>
+                <button id="auth-button" class="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-300">Login</button>
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors duration-300 flex items-center space-x-2" data-page="cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart">
                         <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
@@ -368,7 +426,7 @@
                             </svg>
                         </button>
                         <div class="w-full h-48 bg-gray-700 flex items-center justify-center rounded-lg mb-4">
-                            <img src="https://TattiGand.github.io/inkemon/images/c.png" alt="Chatot Pokemon Card" class="w-auto h-full object-contain rounded-lg">
+                            <img src="https://TattiGand.github.io/inkemon/images/chatot.png" alt="Chatot Pokemon Card" class="w-auto h-full object-contain rounded-lg">
                         </div>
                         <h3 class="text-xl font-semibold mb-2">Chatot Pokémon TCG Card - Basic</h3>
                         <p class="text-gray-400 text-sm mb-2">
@@ -798,8 +856,7 @@
         // Global array to store cart items
         let cartItems = [];
         const SHIPPING_CHARGE = 123; // Fixed shipping charge
-        const MAX_PRODUCT_QUANTITY = 5; // Maximum quantity for a single product in the cart
-        const MAX_SHIPPING_DISTANCE = 100; // Maximum allowed shipping distance in km (still relevant for address validation if needed later)
+        const MAX_PRODUCT_QUANTITY = 1; // Maximum quantity for a single product in the cart
 
         // Global variable to hold the currently active category for product filtering
         let currentActiveCategory = 'all';
@@ -1323,7 +1380,7 @@
                     const razorpayAmount = orderDetails.totalAmount * 100; // Amount in paise
 
                     const options = {
-                        key: "rzp_test_ZxlY5x1fQ5Axse", // Your Razorpay Key
+                        key: "rzp_test_ZxlY5x1fQ5Axse", // Your Razorpay Key - UPDATE THIS IF YOU HAVE A DIFFERENT KEY
                         amount: razorpayAmount,
                         currency: "INR",
                         name: "Inkémon",
