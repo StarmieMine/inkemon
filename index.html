@@ -11,63 +11,8 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <!-- Razorpay Checkout SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <!-- Firebase SDKs for Auth -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        
-        // Firebase configuration is provided by the environment
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        // Global Firebase and Auth instances
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.googleAuthProvider = provider;
-        
-        // Listen for auth state changes
-        onAuthStateChanged(auth, async (user) => {
-            const authStatusDiv = document.getElementById('auth-status');
-            const authButton = document.getElementById('auth-button');
-
-            if (user) {
-                // User is signed in
-                authStatusDiv.textContent = `Welcome, ${user.displayName || user.email}!`;
-                authButton.textContent = 'Logout';
-                authButton.onclick = async () => {
-                    try {
-                        await signOut(auth);
-                        showToast('Logged out successfully!');
-                    } catch (error) {
-                        console.error('Error logging out:', error);
-                        showToast('Error logging out. Please try again.');
-                    }
-                };
-            } else {
-                // User is signed out
-                authStatusDiv.textContent = 'Not logged in';
-                authButton.textContent = 'Login with Google';
-                authButton.onclick = async () => {
-                    try {
-                        // Sign in with custom token if available, otherwise anonymously
-                        if (typeof __initial_auth_token !== 'undefined') {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                        // Then proceed with Google sign-in
-                        await signInWithPopup(auth, provider);
-                        showToast('Logged in with Google!');
-                    } catch (error) {
-                        console.error('Error during Google login:', error);
-                        showToast('Error logging in with Google. Please try again.');
-                    }
-                };
-            }
-        });
-    </script>
+    <!-- Google Identity Services Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script type="text/javascript">
         (function() {
             // Initialize EmailJS with your Public Key
@@ -248,6 +193,14 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.15), 0 3px 6px -1px rgba(0, 0, 0, 0.08);
         }
+
+        /* Styles for the Login Modal */
+        #login-modal {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        #login-modal .modal-content {
+            max-width: 24rem;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -426,7 +379,7 @@
                             </svg>
                         </button>
                         <div class="w-full h-48 bg-gray-700 flex items-center justify-center rounded-lg mb-4">
-                            <img src="https://TattiGand.github.io/inkemon/images/c.png" alt="Chatot Pokemon Card" class="w-auto h-full object-contain rounded-lg">
+                            <img src="https://TattiGand.github.io/inkemon/images/chatot.png" alt="Chatot Pokemon Card" class="w-auto h-full object-contain rounded-lg">
                         </div>
                         <h3 class="text-xl font-semibold mb-2">Chatot Pokémon TCG Card - Basic</h3>
                         <p class="text-gray-400 text-sm mb-2">
@@ -563,7 +516,8 @@
                             </div>
                             <p class="text-red-500 text-sm mt-4">Only UPI (Paytm, PhonePe) available.</p>
                         </div>
-                        <button id="proceed-to-checkout-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md mt-8 text-lg font-semibold">Proceed to Checkout</button>
+                        <button id="proceed-to-checkout-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md mt-8 text-lg font-semibold" disabled>Proceed to Checkout</button>
+                        <p id="login-required-message" class="text-yellow-400 text-center text-sm mt-2">Login to proceed to checkout</p>
                     </div>
                 </div>
             </div>
@@ -852,6 +806,36 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="close-login-modal-btn" class="modal-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                </svg>
+            </button>
+            <h3 class="modal-title text-blue-400">Login to Inkémon</h3>
+            <p class="modal-text text-gray-300 mb-6">Sign in with your Google account to access more features.</p>
+            
+            <!-- Google Sign-In Button Container -->
+            <div id="g_id_onload"
+                 data-client_id="525630091315-vvjocicjsbutcffmjgubuq3hofbl9qvb.apps.googleusercontent.com"
+                 data-login_uri="http://localhost:3000/api/auth/google"
+                 data-auto_prompt="false"
+                 data-callback="handleCredentialResponse">
+            </div>
+
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global array to store cart items
         let cartItems = [];
@@ -860,8 +844,7 @@
 
         // Global variable to hold the currently active category for product filtering
         let currentActiveCategory = 'all';
-
-        // --- Functions moved to global scope for accessibility ---
+        let loggedInUserEmail = null; // Stores the email of the logged-in user
 
         // Function to update cart count in header
         const updateCartCount = () => {
@@ -884,6 +867,42 @@
             }
         };
 
+        // Function to save the current cart to localStorage for the logged-in user
+        const saveCartToLocalStorage = () => {
+            if (loggedInUserEmail && cartItems.length > 0) {
+                localStorage.setItem(`cart_${loggedInUserEmail}`, JSON.stringify(cartItems));
+                console.log(`Cart saved for ${loggedInUserEmail}`);
+            } else if (loggedInUserEmail && cartItems.length === 0) {
+                // If cart is empty for a logged-in user, remove their cart from storage
+                localStorage.removeItem(`cart_${loggedInUserEmail}`);
+                console.log(`Empty cart removed for ${loggedInUserEmail}`);
+            }
+        };
+
+        // Function to load the cart from localStorage for the logged-in user
+        const loadCartForUser = (userEmail) => {
+            if (userEmail) {
+                const storedCart = localStorage.getItem(`cart_${userEmail}`);
+                if (storedCart) {
+                    try {
+                        cartItems = JSON.parse(storedCart);
+                        console.log(`Cart loaded for ${userEmail}:`, cartItems);
+                    } catch (e) {
+                        console.error("Failed to parse stored cart:", e);
+                        cartItems = [];
+                    }
+                } else {
+                    cartItems = []; // No stored cart for this user
+                    console.log(`No stored cart found for ${userEmail}.`);
+                }
+            } else {
+                cartItems = []; // No user logged in, clear cart
+                console.log("No user logged in, cart cleared.");
+            }
+            updateCartCount();
+            renderCartItems();
+        };
+
         // Function to add item to cart
         const addItemToCart = async (name, price) => {
             const trimmedName = name.trim(); // Trim name for consistency
@@ -901,14 +920,18 @@
             }
             updateCartCount();
             renderCartItems(); // Call renderCartItems to update cart display immediately
+            saveCartToLocalStorage(); // Save cart after modification
         };
 
         // Function to render cart items on the cart page
         const renderCartItems = () => {
             const cartItemsContainer = document.getElementById('cart-items-container');
             const emptyCartMessage = document.getElementById('empty-cart-message');
+            const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
+            const loginRequiredMessage = document.getElementById('login-required-message');
 
-            if (!cartItemsContainer || !emptyCartMessage) {
+
+            if (!cartItemsContainer || !emptyCartMessage || !proceedToCheckoutBtn || !loginRequiredMessage) {
                 console.warn("Cart elements not found. Cannot render cart items.");
                 return;
             }
@@ -951,6 +974,14 @@
                 });
             }
             calculateCartTotals();
+            // Enable/Disable checkout button based on login status
+            if (loggedInUserEmail) {
+                proceedToCheckoutBtn.disabled = false;
+                loginRequiredMessage.style.display = 'none';
+            } else {
+                proceedToCheckoutBtn.disabled = true;
+                loginRequiredMessage.style.display = 'block';
+            }
             console.log("renderCartItems: HTML after rendering:", cartItemsContainer.innerHTML); // Debug log
         };
 
@@ -1154,6 +1185,89 @@
                 });
         }
 
+        // Google Sign-In Callback Function
+        window.handleCredentialResponse = async (response) => {
+            console.log("Encoded JWT ID token: " + response.credential);
+            const loginModal = document.getElementById('login-modal');
+            const authStatusDiv = document.getElementById('auth-status');
+            const authButton = document.getElementById('auth-button');
+            const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
+            const loginRequiredMessage = document.getElementById('login-required-message');
+
+
+            try {
+                const backendResponse = await fetch('http://localhost:3000/api/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                if (backendResponse.ok) {
+                    const data = await backendResponse.json(); // Assuming backend returns JSON with user data
+                    loggedInUserEmail = data.user.email; // Set global user email
+                    localStorage.setItem('loggedInUserEmail', loggedInUserEmail);
+                    localStorage.setItem('userName', data.user.name || data.user.email); // Store user name
+
+                    showToast(`Login successful! Welcome, ${data.user.name || data.user.email}!`);
+                    loginModal.classList.add('hidden'); // Hide modal on successful login
+
+                    authStatusDiv.textContent = `Welcome, ${data.user.name || data.user.email}!`;
+                    authButton.textContent = 'Logout';
+                    authButton.onclick = logout; // Assign logout function
+
+                    loadCartForUser(loggedInUserEmail); // Load user's specific cart
+                    proceedToCheckoutBtn.disabled = false; // Enable checkout button
+                    loginRequiredMessage.style.display = 'none'; // Hide login message
+
+                } else {
+                    const errorText = await backendResponse.text();
+                    console.error('Backend login failed:', errorText);
+                    showToast('Login failed. Please try again.');
+                    proceedToCheckoutBtn.disabled = true; // Keep checkout button disabled
+                    loginRequiredMessage.style.display = 'block'; // Show login message
+                }
+            } catch (error) {
+                console.error('Error sending credential to backend:', error);
+                showToast('An error occurred during login. Please try again.');
+                proceedToCheckoutBtn.disabled = true; // Keep checkout button disabled
+                loginRequiredMessage.style.display = 'block'; // Show login message
+            }
+        };
+
+        // Function to handle logout
+        const logout = () => {
+            const authStatusDiv = document.getElementById('auth-status');
+            const authButton = document.getElementById('auth-button');
+            const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
+            const loginRequiredMessage = document.getElementById('login-required-message');
+
+            // Revoke Google session (prevents auto-login on next visit if user logs out)
+            if (google.accounts.id) {
+                google.accounts.id.disableAutoSelect();
+            }
+            
+            // Clear local storage flags and user email
+            localStorage.removeItem('loggedInUserEmail');
+            localStorage.removeItem('userName');
+            loggedInUserEmail = null; // Clear global user email
+
+            // Reset UI
+            authStatusDiv.textContent = 'Not logged in';
+            authButton.textContent = 'Login';
+            authButton.onclick = () => document.getElementById('login-modal').classList.remove('hidden'); // Re-assign click handler
+
+            cartItems = []; // Clear the current cart items in memory
+            renderCartItems(); // Re-render cart to show empty state
+            updateCartCount(); // Update cart count to 0
+
+            proceedToCheckoutBtn.disabled = true; // Disable checkout button
+            loginRequiredMessage.style.display = 'block'; // Show login message
+
+            showToast('Logged out successfully!');
+        };
+
 
         // --- DOMContentLoaded listener and event attachments ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -1169,9 +1283,8 @@
             const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
             const continueToPaymentBtn = document.getElementById('continue-to-payment-btn');
             const backToCartBtn = document.getElementById('back-to-cart-btn');
-            const addressSection = document.getElementById('address-section');
-            // The payment-section with UPI details is now removed from HTML, so no need to reference it here.
-
+            const loginRequiredMessage = document.getElementById('login-required-message');
+            
             // Address input fields
             const fullNameInput = document.getElementById('full-name');
             const emailInput = document.getElementById('email');
@@ -1187,12 +1300,18 @@
             const closeModalBtn = document.getElementById('close-modal-btn');
             const acknowledgeModalBtn = document.getElementById('acknowledge-modal-btn');
 
+            // Login modal elements
+            const loginModal = document.getElementById('login-modal');
+            const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
+            const authButton = document.getElementById('auth-button');
+            const authStatusDiv = document.getElementById('auth-status');
+
             // Show welcome modal if not dismissed before
             if (localStorage.getItem('welcomeModalDismissed') !== 'true') {
                 welcomeModal.classList.remove('hidden');
             }
 
-            // Close modal event listeners
+            // Close welcome modal event listeners
             closeModalBtn.addEventListener('click', () => {
                 welcomeModal.classList.add('hidden');
                 localStorage.setItem('welcomeModalDismissed', 'true');
@@ -1202,6 +1321,29 @@
                 welcomeModal.classList.add('hidden');
                 localStorage.setItem('welcomeModalDismissed', 'true');
             });
+
+            // Login modal close button
+            closeLoginModalBtn.addEventListener('click', () => {
+                loginModal.classList.add('hidden');
+            });
+
+            // Initial auth state check and button setup
+            loggedInUserEmail = localStorage.getItem('loggedInUserEmail');
+            if (loggedInUserEmail) {
+                authStatusDiv.textContent = `Welcome, ${localStorage.getItem('userName') || loggedInUserEmail}!`;
+                authButton.textContent = 'Logout';
+                authButton.onclick = logout;
+                proceedToCheckoutBtn.disabled = false; // Enable checkout button
+                loginRequiredMessage.style.display = 'none'; // Hide login message
+                loadCartForUser(loggedInUserEmail); // Load cart for the logged-in user
+            } else {
+                authStatusDiv.textContent = 'Not logged in';
+                authButton.textContent = 'Login';
+                authButton.onclick = () => loginModal.classList.remove('hidden');
+                proceedToCheckoutBtn.disabled = true; // Disable checkout button
+                loginRequiredMessage.style.display = 'block'; // Show login message
+            }
+
 
             // Event listeners for navigation links
             navLinks.forEach(link => {
@@ -1294,6 +1436,7 @@
                             renderCartItems();
                             updateCartCount();
                             calculateCartTotals();
+                            saveCartToLocalStorage(); // Save cart after modification
                         } else {
                             console.warn(`Attempted to update quantity for non-existent item: ${itemName}. Re-rendering cart.`);
                             renderCartItems(); // Fallback to full re-render if item not found (e.g., after removal)
@@ -1308,6 +1451,7 @@
                         }
                         renderCartItems(); // Re-render cart after removal
                         updateCartCount();
+                        saveCartToLocalStorage(); // Save cart after modification
                     }
                 });
             }
@@ -1316,6 +1460,11 @@
             // Event listener for Proceed to Checkout button
             if (proceedToCheckoutBtn) {
                 proceedToCheckoutBtn.addEventListener('click', () => {
+                    if (!loggedInUserEmail) {
+                        showToast("Please log in with Google to proceed to checkout.");
+                        loginModal.classList.remove('hidden'); // Show login modal
+                        return;
+                    }
                     if (cartItems.length === 0) {
                         showToast("Your cart is empty. Please add items before proceeding to checkout.");
                         return; // Prevent navigating if cart is empty
@@ -1392,6 +1541,7 @@
                             
                             // Clear cart and redirect after successful payment and email attempt
                             cartItems = [];
+                            saveCartToLocalStorage(); // Save empty cart for the user
                             updateCartCount();
                             renderCartItems();
                             showPage('home-page');
