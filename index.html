@@ -4,43 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inkémon - Cutting-Edge Products</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <!-- Razorpay Checkout SDK -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <!-- Google Identity Services Library -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Firebase SDKs -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase configuration and initialization (provided by the environment)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // Expose Firebase objects to the global scope for use in the main script
-        window.firebaseApp = app;
-        window.firebaseDb = db;
-        window.firebaseAuth = auth;
-        window.GoogleAuthProvider = GoogleAuthProvider;
-        window.signInWithPopup = signInWithPopup;
-        window.signOut = signOut;
-        window.onAuthStateChanged = onAuthStateChanged;
-        window.firebaseFirestore = { doc, getDoc, setDoc, updateDoc, collection, query, where, addDoc, getDocs, deleteDoc };
-        window.appId = appId; // Expose appId globally
-    </script>
-
+    
     <script type="text/javascript">
         (function() {
             // Initialize EmailJS with your Public Key
@@ -69,12 +37,17 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+        
+        /* Page section styles - animations removed for instant display */
         .page-section {
-            display: none; /* Hidden by default */
+            display: none; /* Hidden by default, managed by JS */
         }
+
         .page-section.active {
             display: block; /* Shown when active */
         }
+
+        /* Accordion styles */
         .accordion-header {
             cursor: pointer;
             padding: 1rem;
@@ -100,11 +73,11 @@
             transform: rotate(180deg);
         }
 
-        /* Aesthetic animation for Hero Section - More vibrant blues */
+        /* Aesthetic background for Hero Section - Now with animated darker rays */
         .hero-animated-bg {
-            background: radial-gradient(circle at top left, #007bff, #000 50%, #00c2ff); /* Vibrant blue gradient */
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite alternate;
+            background: linear-gradient(270deg, #000000 0%, #0a192f 25%, #004080 50%, #0a192f 75%, #000000 100%); /* Darker blue and black gradient with distinct blue rays */
+            background-size: 500% 500%; /* Larger background for more expansive animation */
+            animation: gradientShift 20s ease infinite alternate; /* Slower animation for smoother ray effect */
         }
 
         @keyframes gradientShift {
@@ -220,40 +193,37 @@
             box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.15), 0 3px 6px -1px rgba(0, 0, 0, 0.08);
         }
 
-        /* Styles for the Login Modal */
-        #login-modal {
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-        #login-modal .modal-content {
-            max-width: 24rem;
+        /* Discount badge styling */
+        .discount-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem; /* rounded-md */
+            font-weight: 600; /* font-semibold */
+            font-size: 0.875rem; /* text-sm */
+            z-index: 10;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-    <!-- Header -->
     <header class="bg-black text-white shadow-lg sticky top-0 z-50 border-b-2 border-blue-600">
         <nav class="container mx-auto pl-4 py-3 flex items-center justify-between space-x-6">
-            <!-- Logo and Navigation Links Group -->
             <div class="flex items-center space-x-3 cursor-pointer" onclick="showPage('home-page')">
-                <!-- Logo - Using your GitHub Pages image URL -->
                 <div class="p-2 bg-blue-600 rounded-full overflow-hidden flex items-center justify-center">
                     <img src="https://starmiemine.github.io/inkemon/images/my_thing.png" alt="Inkémon Logo" class="w-12 h-12 object-cover rounded-full">
                 </div>
                 <span class="text-2xl font-bold text-blue-400">Inkémon</span>
             </div>
-            <!-- Navigation Links - Now directly beside the logo group for desktop, no outer box -->
             <div class="hidden md:flex items-center space-x-4">
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300" data-page="home">Home</a>
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300" data-page="products">Products</a>
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300" data-page="faq">FAQ</a>
-                <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 hidden" id="order-history-nav" data-page="order-history">Order History</a>
-                <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300" data-page="admin-panel">Admin Panel</a>
             </div>
-            <!-- Auth and Cart Buttons -->
             <div class="flex items-center space-x-4">
-                <div id="auth-status" class="text-sm text-gray-400">Not logged in</div>
-                <button id="auth-button" class="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-300">Login</button>
                 <a href="#" class="nav-link text-lg px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition-colors duration-300 flex items-center space-x-2" data-page="cart">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart">
                         <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
@@ -269,21 +239,15 @@
                 </div>
             </div>
         </nav>
-        <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden bg-gray-900 py-2">
             <a href="#" class="block px-4 py-2 text-lg hover:bg-blue-700 transition-colors duration-300 nav-link" data-page="home">Home</a>
             <a href="#" class="block px-4 py-2 text-lg hover:bg-blue-700 transition-colors duration-300 nav-link" data-page="products">Products</a>
             <a href="#" class="block px-4 py-2 text-lg hover:bg-blue-700 transition-colors duration-300 nav-link" data-page="faq">FAQ</a>
-            <a href="#" class="block px-4 py-2 text-lg hover:bg-blue-700 transition-colors duration-300 hidden" id="mobile-order-history-nav" data-page="order-history">Order History</a>
-            <a href="#" class="block px-4 py-2 text-lg hover:bg-blue-700 transition-colors duration-300" data-page="admin-panel">Admin Panel</a>
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="flex-grow">
-        <!-- Home Page Section -->
         <section id="home-page" class="page-section active">
-            <!-- Hero Section - Added hero-animated-bg class -->
             <div class="hero-animated-bg text-white py-20 md:py-32 text-center rounded-b-xl shadow-lg overflow-hidden">
                 <div class="container mx-auto px-4">
                     <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
@@ -292,7 +256,6 @@
                     <p class="text-lg md:text-xl text-blue-200 mb-8">
                         Engineered for precision, designed for tomorrow.
                     </p>
-                    <!-- New button to navigate to products page (all products) -->
                     <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                         <button class="nav-link bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-blue-700 transition-colors duration-300 shadow-lg transform hover:scale-105" data-page="products">
                             Shop All Products
@@ -301,7 +264,6 @@
                 </div>
             </div>
 
-            <!-- Features Section -->
             <div class="bg-gray-900 py-16">
                 <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
                     <div class="flex flex-col items-center p-6 bg-gray-800 rounded-xl shadow-lg">
@@ -314,22 +276,25 @@
                         <h3 class="text-xl font-semibold mb-2">Secure Payment</h3>
                         <p class="text-gray-400">100% secure payment processing</p>
                     </div>
-                    <div class="flex flex-col items-center p-6 bg-gray-800 rounded-xl shadow-lg">
-                        <div class="p-4 bg-blue-600 rounded-full mb-4">
-                            <!-- Headphone icon for 24/7 Support -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-headphones text-white">
-                                <path d="M18 10c0 7-6 9-9 9s-9-2-9-9V3h18v7Z"/>
-                                <path d="M2 17v-2a9 9 0 0 1 18 0v2"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold mb-2">24/7 Support</h3>
-                        <p class="text-gray-400">Round-the-clock customer support</p>
+<div class="flex flex-col items-center p-6 bg-gray-800 rounded-xl shadow-lg">
+    <div class="p-4 bg-blue-600 rounded-full mb-4">
+        <!-- Corrected Headphone Icon with White Stroke -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" 
+             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" />
+            <path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3" />
+        </svg>
+    </div>
+    <h3 class="text-xl font-semibold mb-2 text-white">24/7 Support</h3>
+    <p class="text-gray-400 text-center">Round-the-clock customer support</p>
+</div>
+
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Products Page Section -->
         <section id="products-page" class="page-section">
             <div class="container mx-auto px-4 py-12">
                 <h2 class="text-4xl font-bold text-center mb-4 text-blue-400">Our <span class="text-white">Products</span></h2>
@@ -346,8 +311,8 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="product-list">
-                    <!-- Demon Slayer Product Card -->
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="demon-slayer">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -361,12 +326,15 @@
                             Unleash your inner demon slayer with this exclusive collectible card from Kimetsu no Yaiba! Featuring your favorite characters, this card is a must-have for any fan.
                             #DemonSlayer #KimetsuNoYaiba #AnimeCard #Collectible #Manga #Tanjiro #Nezuko
                         </p>
-                        <p class="text-gray-400 mb-4">₹180</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">360</span></span>
+                            ₹<span class="discounted-price">180</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Demon Slayer Collectible Card" data-price="180">Add to Cart</button>
                     </div>
 
-                    <!-- New Pokemon Products from uploaded images -->
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -380,11 +348,15 @@
                             Add this charming Bellsprout card to your Pokémon TCG collection! Perfect for fans and collectors, this common card features vibrant artwork and is ready for battle or display.
                             #PokemonTCG #Bellsprout #PokemonCard #Collectible #Gaming #PokemonCommunity
                         </p>
-                        <p class="text-gray-400 mb-4">₹100</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">200</span></span>
+                            ₹<span class="discounted-price">100</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Bellsprout Pokémon TCG Card" data-price="100">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -398,29 +370,37 @@
                             Elevate your Pokémon team with this beautiful Butterfree Stage 2 evolution card! Featuring stunning artwork and powerful moves, it's a must-have for any serious trainer or collector.
                             #PokemonTCG #Butterfree #EvolutionCard #RarePokemon #CardCollector #PokemonFan
                         </p>
-                        <p class="text-gray-400 mb-4">₹120</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">240</span></span>
+                            ₹<span class="discounted-price">120</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Butterfree Pokémon TCG Card" data-price="120">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                             </svg>
                         </button>
                         <div class="w-full h-48 bg-gray-700 flex items-center justify-center rounded-lg mb-4">
-                            <img src="https://starmiemine.github.io/inkemon/images/chatot.png" alt="Chatot Pokemon Card" class="w-auto h-full object-contain rounded-lg">
+                            <img src="https://starmiemine.github.io/inkemon/images/c.png" alt="Chatot Pokemon Card" class="w-auto h-full object-contain rounded-lg">
                         </div>
                         <h3 class="text-xl font-semibold mb-2">Chatot Pokémon TCG Card - Basic</h3>
                         <p class="text-gray-400 text-sm mb-2">
                             Bring the melody to your battles with this charming Chatot Basic Pokémon card! A delightful addition for any collector, featuring unique abilities for your deck.
                             #PokemonTCG #Chatot #BasicPokemon #MusicNotePokemon #CardGame #PokemonCollector
                         </p>
-                        <p class="text-gray-400 mb-4">₹100</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">200</span></span>
+                            ₹<span class="discounted-price">100</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Chatot Pokémon TCG Card" data-price="100">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -434,11 +414,15 @@
                             Crack open a new strategy with this Exeggcute Basic Pokémon card! A quirky and fun addition to any Pokémon TCG collection, featuring its iconic cluster design.
                             #PokemonTCG #Exeggcute #BasicPokemon #EggPokemon #CardCollecting #PokemonCards
                         </p>
-                        <p class="text-gray-400 mb-4">₹110</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">220</span></span>
+                            ₹<span class="discounted-price">110</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Exeggcute Pokémon TCG Card" data-price="110">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -452,11 +436,15 @@
                             Unleash powerful punches with this dynamic Hitmonchan Basic Pokémon card! A fighting-type favorite, perfect for adding strength to your Pokémon TCG deck.
                             #PokemonTCG #Hitmonchan #FightingPokemon #BasicCard #PokemonBattles #TrainerCard
                         </p>
-                        <p class="text-gray-400 mb-4">₹130</p>
+                        <p class="text-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">260</span></span>
+                            ₹<span class="discounted-price">130</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Hitmonchan Pokémon TCG Card" data-price="130">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -470,11 +458,15 @@
                             Glide through your battles with this stunning Lapras Basic Pokémon card! A beloved Water-type, perfect for adding a touch of elegance and power to your collection.
                             #PokemonTCG #Lapras #WaterPokemon #BasicCard #PokemonCollector #RareFind
                         </p>
-                        <p class="text-gray-400 mb-4">₹150</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">300</span></span>
+                            ₹<span class="discounted-price">150</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Lapras Pokémon TCG Card" data-price="150">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -488,11 +480,15 @@
                             Rule the waters with this majestic Seaking Stage 1 evolution card! A powerful addition to any water-themed deck, featuring vibrant artwork.
                             #PokemonTCG #Seaking #WaterType #EvolutionCard #PokemonFan #TradingCard
                         </p>
-                        <p class="text-gray-400 mb-4">₹100</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">200</span></span>
+                            ₹<span class="discounted-price">100</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Seaking Pokémon TCG Card" data-price="100">Add to Cart</button>
                     </div>
 
                     <div class="product-card bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 relative transition-transform duration-300 hover:scale-103 hover:shadow-blue-500/50" data-category="pokemon">
+                        <span class="discount-badge">50% Off</span>
                         <button class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -506,29 +502,28 @@
                             Shine bright with this sparkling Staryu Basic Pokémon card! A classic water-type, perfect for any Pokémon TCG player or collector.
                             #PokemonTCG #Staryu #WaterPokemon #BasicCard #PokemonCollection #CardGame
                         </p>
-                        <p class="text-gray-400 mb-4">₹100</p>
+                        <p class="text-gray-400 mb-4">
+                            <span class="line-through mr-2">₹<span class="original-price">200</span></span>
+                            ₹<span class="discounted-price">100</span>
+                        </p>
                         <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md add-to-cart" data-name="Staryu Pokémon TCG Card" data-price="100">Add to Cart</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Cart Page Section -->
         <section id="cart-page" class="page-section">
             <div class="container mx-auto px-4 py-12">
                 <h2 class="text-4xl font-bold text-center mb-8 text-blue-400">Your <span class="text-white">Cart</span></h2>
 
                 <div class="flex flex-col lg:flex-row gap-8">
-                    <!-- Cart Items List -->
                     <div class="lg:w-2/3 bg-gray-800 rounded-xl shadow-lg p-6">
                         <h3 class="text-2xl font-semibold mb-6 text-white border-b border-gray-700 pb-4">Shopping Cart</h3>
                         <div id="cart-items-container" class="space-y-6">
-                            <!-- Cart items will be rendered here by JavaScript -->
                             <p id="empty-cart-message" class="text-gray-400 text-center text-lg">Your cart is empty.</p>
                         </div>
                     </div>
 
-                    <!-- Order Summary -->
                     <div class="lg:w-1/3 bg-gray-800 rounded-xl shadow-lg p-6 h-fit">
                         <h3 class="text-2xl font-semibold mb-6 text-white border-b border-gray-700 pb-4">Order Summary</h3>
                         <div class="space-y-4 text-lg">
@@ -546,24 +541,20 @@
                             </div>
                             <p class="text-red-500 text-sm mt-4">Only UPI (Paytm, PhonePe) available.</p>
                         </div>
-                        <button id="proceed-to-checkout-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md mt-8 text-lg font-semibold" disabled>Proceed to Checkout</button>
-                        <p id="login-required-message" class="text-yellow-400 text-center text-sm mt-2">Login to proceed to checkout</p>
+                        <button id="proceed-to-checkout-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md mt-8 text-lg font-semibold">Proceed to Checkout</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Transaction Menu Page Section -->
         <section id="transaction-menu-page" class="page-section">
             <div class="container mx-auto px-4 py-12">
                 <h2 class="text-4xl font-bold text-center mb-8 text-blue-400">Complete Your <span class="text-white">Purchase</span></h2>
 
                 <div class="flex flex-col lg:flex-row gap-8">
-                    <!-- Order Details -->
                     <div class="lg:w-2/3 bg-gray-800 rounded-xl shadow-lg p-6">
                         <h3 class="text-2xl font-semibold mb-6 text-white border-b border-gray-700 pb-4">Order Details</h3>
                         <div id="transaction-items-container" class="space-y-4">
-                            <!-- Transaction items will be rendered here by JavaScript -->
                             <p class="text-gray-400 text-center text-lg">No items in order.</p>
                         </div>
                         <div class="space-y-4 text-lg mt-8 pt-4 border-t border-gray-700">
@@ -582,7 +573,6 @@
                         </div>
                     </div>
 
-                    <!-- Address Section -->
                     <div class="lg:w-1/3 bg-gray-800 rounded-xl shadow-lg p-6 h-fit">
                         <div id="address-section">
                             <h3 class="text-2xl font-semibold mb-6 text-white border-b border-gray-700 pb-4">Shipping Address</h3>
@@ -625,48 +615,13 @@
                                 </div>
                             </div>
                             <button id="continue-to-payment-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md mt-8 text-lg font-semibold">Proceed to Payment</button>
+                            <button id="back-to-cart-btn" class="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors duration-300 shadow-md mt-4 text-lg font-semibold">Back to Cart</button>
                         </div>
-                        <!-- The payment-section with UPI details is removed as Razorpay will handle the payment directly -->
-                        <button id="back-to-cart-btn" class="w-full bg-gray-700 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors duration-300 shadow-md mt-4 text-lg font-semibold">Back to Cart</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Order History Page Section -->
-        <section id="order-history-page" class="page-section">
-            <div class="container mx-auto px-4 py-12">
-                <h2 class="text-4xl font-bold text-center mb-8 text-blue-400">Your <span class="text-white">Order History</span></h2>
-                <div id="order-history-container" class="bg-gray-800 rounded-xl shadow-lg p-6">
-                    <p id="no-orders-message" class="text-gray-400 text-center text-lg">You have no past orders.</p>
-                    <!-- Orders will be dynamically loaded here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Admin Panel Page Section -->
-        <section id="admin-panel-page" class="page-section">
-            <div class="container mx-auto px-4 py-12">
-                <h2 class="text-4xl font-bold text-center mb-8 text-blue-400">Admin <span class="text-white">Panel</span></h2>
-                <div id="admin-login-section" class="max-w-md mx-auto bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h3 class="text-2xl font-semibold mb-4 text-white">Admin Login</h3>
-                    <div class="mb-4">
-                        <label for="admin-password" class="block text-gray-300 text-sm font-bold mb-2">Password</label>
-                        <input type="password" id="admin-password" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white placeholder-gray-400" placeholder="Enter admin password">
-                    </div>
-                    <button id="admin-login-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md text-lg font-semibold">Login to Admin Panel</button>
-                </div>
-
-                <div id="admin-content-section" class="hidden mt-8 bg-gray-800 rounded-xl shadow-lg p-6">
-                    <h3 class="text-2xl font-semibold mb-6 text-white border-b border-gray-700 pb-4">All Orders</h3>
-                    <div id="all-orders-container" class="space-y-6">
-                        <p class="text-gray-400 text-center text-lg">No orders found.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FAQ Page Section -->
         <section id="faq-page" class="page-section">
             <div class="container mx-auto px-4 py-12">
                 <h2 class="text-4xl font-bold text-center mb-4 text-blue-400">Frequently Asked <span class="text-white">Questions</span></h2>
@@ -675,7 +630,6 @@
                 </p>
 
                 <div class="max-w-3xl mx-auto space-y-6">
-                    <!-- General Questions -->
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                         <div class="bg-blue-600 text-white text-xl font-semibold p-4 rounded-t-xl">General Questions</div>
                         <div class="accordion-item">
@@ -706,7 +660,6 @@
                         </div>
                     </div>
 
-                    <!-- Orders & Shipping -->
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                         <div class="bg-blue-600 text-white text-xl font-semibold p-4 rounded-t-xl">Orders & Shipping</div>
                         <div class="accordion-item">
@@ -737,7 +690,6 @@
                         </div>
                     </div>
 
-                    <!-- Returns & Refunds -->
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                         <div class="bg-blue-600 text-white text-xl font-semibold p-4 rounded-t-xl">Returns & Refunds</div>
                         <div class="accordion-item">
@@ -768,7 +720,6 @@
                         </div>
                     </div>
 
-                    <!-- Payment & Security -->
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                         <div class="bg-blue-600 text-white text-xl font-semibold p-4 rounded-t-xl">Payment & Security</div>
                         <div class="accordion-item">
@@ -788,7 +739,7 @@
                             <div class="accordion-header text-white font-medium">
                                 Is my payment information secure?
                                 <span class="arrow">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart">
                                         <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
                                     </svg>
                                 </span>
@@ -799,7 +750,6 @@
                         </div>
                     </div>
 
-                    <!-- Products & Quality -->
                     <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                         <div class="bg-blue-600 text-white text-xl font-semibold p-4 rounded-t-xl">Products & Quality</div>
                         <div class="accordion-item">
@@ -821,7 +771,6 @@
         </section>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-black text-white py-12 mt-auto rounded-t-xl shadow-inner">
         <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <div class="flex flex-col space-y-4">
@@ -846,10 +795,8 @@
         </div>
     </footer>
 
-    <!-- Toast Notification -->
     <div id="toast-message" class="toast"></div>
 
-    <!-- Pop-up Modal Structure -->
     <div id="welcome-modal" class="modal-overlay hidden">
         <div class="modal-content">
             <button id="close-modal-btn" class="modal-close-btn">
@@ -869,36 +816,6 @@
         </div>
     </div>
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <button id="close-login-modal-btn" class="modal-close-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
-                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                </svg>
-            </button>
-            <h3 class="modal-title text-blue-400">Login to Inkémon</h3>
-            <p class="modal-text text-gray-300 mb-6">Sign in with your Google account to access more features.</p>
-            
-            <!-- Google Sign-In Button Container -->
-            <div id="g_id_onload"
-                 data-client_id="525630091315-vvjocicjsbutcffmjgubuq3hofbl9qvb.apps.googleusercontent.com"
-                 data-login_uri="http://localhost:3000/api/auth/google"
-                 data-auto_prompt="false"
-                 data-callback="handleCredentialResponse">
-            </div>
-
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-shape="rectangular"
-                 data-logo_alignment="left">
-            </div>
-        </div>
-    </div>
-
     <script>
         // Global array to store cart items
         let cartItems = [];
@@ -907,10 +824,6 @@
 
         // Global variable to hold the currently active category for product filtering
         let currentActiveCategory = 'all';
-        let loggedInUser = null; // Stores the Firebase User object
-        let firestoreDb; // Firestore instance
-        let firebaseAuth; // Firebase Auth instance
-        let currentAppId; // Global appId from environment
 
         // Function to update cart count in header
         const updateCartCount = () => {
@@ -933,55 +846,33 @@
             }
         };
 
-        // Function to save the current cart to Firestore for the logged-in user
-        const saveCartToFirestore = async () => {
-            if (loggedInUser && firestoreDb) {
-                const userId = loggedInUser.uid;
-                const cartRef = window.firebaseFirestore.doc(firestoreDb, `artifacts/${currentAppId}/users/${userId}/carts/userCart`);
-                try {
-                    await window.firebaseFirestore.setDoc(cartRef, { items: JSON.stringify(cartItems) }, { merge: true });
-                    console.log(`Cart saved for ${userId}`);
-                } catch (e) {
-                    console.error("Error saving cart to Firestore:", e);
-                    showToast("Failed to save cart to cloud.");
-                }
-            }
+        // Function to save the current cart to localStorage
+        const saveCart = () => {
+            localStorage.setItem('inkemonCart', JSON.stringify(cartItems));
+            console.log("Cart saved to localStorage:", cartItems);
         };
 
-        // Function to load the cart from Firestore for the logged-in user
-        const loadCartForUser = async (user) => {
-            if (user && firestoreDb) {
-                const userId = user.uid;
-                const cartRef = window.firebaseFirestore.doc(firestoreDb, `artifacts/${currentAppId}/users/${userId}/carts/userCart`);
+        // Function to load the cart from localStorage
+        const loadCart = () => {
+            const storedCart = localStorage.getItem('inkemonCart');
+            if (storedCart) {
                 try {
-                    const docSnap = await window.firebaseFirestore.getDoc(cartRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        if (data.items) {
-                            cartItems = JSON.parse(data.items);
-                            console.log(`Cart loaded for ${userId}:`, cartItems);
-                        } else {
-                            cartItems = [];
-                        }
-                    } else {
-                        cartItems = []; // No stored cart for this user
-                        console.log(`No stored cart found for ${userId}.`);
-                    }
+                    cartItems = JSON.parse(storedCart);
+                    console.log("Cart loaded from localStorage:", cartItems);
                 } catch (e) {
-                    console.error("Error loading cart from Firestore:", e);
-                    showToast("Failed to load cart from cloud.");
+                    console.error("Failed to parse stored cart from localStorage:", e);
                     cartItems = [];
                 }
             } else {
-                cartItems = []; // No user logged in, clear cart
-                console.log("No user logged in, cart cleared.");
+                cartItems = []; // No stored cart
+                console.log("No stored cart found in localStorage.");
             }
             updateCartCount();
-            renderCartItems();
         };
 
         // Function to add item to cart
-        const addItemToCart = async (name, price) => {
+        const addItemToCart = (name, price) => {
+            console.log(`Attempting to add: ${name}, Price: ${price}`);
             const trimmedName = name.trim(); // Trim name for consistency
             const existingItem = cartItems.find(item => item.name === trimmedName);
             if (existingItem) {
@@ -995,29 +886,32 @@
                 cartItems.push({ name: trimmedName, price, quantity: 1 });
                 showToast(`${trimmedName} added to cart!`);
             }
+            console.log("Cart after adding item:", cartItems);
             updateCartCount();
-            renderCartItems(); // Call renderCartItems to update cart display immediately
-            await saveCartToFirestore(); // Save cart after modification
+            renderCartItems(); 
+            saveCart(); 
         };
 
         // Function to render cart items on the cart page
         const renderCartItems = () => {
+            console.log("Rendering cart items. Current cart:", cartItems);
             const cartItemsContainer = document.getElementById('cart-items-container');
             const emptyCartMessage = document.getElementById('empty-cart-message');
             const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
-            const loginRequiredMessage = document.getElementById('login-required-message');
 
-            if (!cartItemsContainer || !emptyCartMessage || !proceedToCheckoutBtn || !loginRequiredMessage) {
-                console.warn("Cart elements not found. Cannot render cart items.");
-                return;
+            if (!cartItemsContainer || !emptyCartMessage || !proceedToCheckoutBtn) {
+                console.warn("Cart elements not found (likely not on cart page). Skipping renderCartItems display logic.");
+                return; 
             }
 
             cartItemsContainer.innerHTML = ''; // Clear existing items
 
             if (cartItems.length === 0) {
                 emptyCartMessage.style.display = 'block';
+                proceedToCheckoutBtn.disabled = true; // Disable if cart is empty
             } else {
                 emptyCartMessage.style.display = 'none';
+                proceedToCheckoutBtn.disabled = false; // Enable if cart has items
                 cartItems.forEach((item) => {
                     const itemElement = document.createElement('div');
                     itemElement.classList.add('flex', 'items-center', 'justify-between', 'bg-gray-700', 'p-4', 'rounded-lg', 'shadow-md');
@@ -1049,24 +943,16 @@
                 });
             }
             calculateCartTotals();
-            // Enable/Disable checkout button based on login status
-            if (loggedInUser) {
-                proceedToCheckoutBtn.disabled = false;
-                loginRequiredMessage.style.display = 'none';
-            } else {
-                proceedToCheckoutBtn.disabled = true;
-                loginRequiredMessage.style.display = 'block';
-            }
         };
 
-        // Function to calculate and update cart totals
+        // Function to calculate and update cart totals (for cart page)
         const calculateCartTotals = () => {
             const cartSubtotalSpan = document.getElementById('cart-subtotal');
             const cartShippingSpan = document.getElementById('cart-shipping');
             const cartTotalSpan = document.getElementById('cart-total');
 
             if (!cartSubtotalSpan || !cartShippingSpan || !cartTotalSpan) {
-                console.warn("Cart total elements not found. Cannot calculate cart totals.");
+                console.warn("Cart total elements not found. Cannot calculate cart totals for cart page.");
                 return;
             }
 
@@ -1164,37 +1050,35 @@
         };
 
         // Function to show a specific page and update active link styling
-        const showPage = async (pageId, category = 'all') => {
+        const showPage = (pageId, category = 'all') => {
             const pageSections = document.querySelectorAll('.page-section');
             const productSearchInput = document.getElementById('product-search-input');
             const navLinks = document.querySelectorAll('.nav-link');
             const mobileMenu = document.getElementById('mobile-menu');
 
-            // Hide all page sections first
+            // Hide all page sections
             pageSections.forEach(section => {
+                section.style.display = 'none';
                 section.classList.remove('active');
-                section.style.display = 'none'; // Ensure display is set to none
             });
 
             // Show the target page
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
+                targetPage.style.display = 'block';
                 targetPage.classList.add('active');
-                targetPage.style.display = 'block'; // Ensure display is set to block
             } else {
                 console.warn(`Page with ID ${pageId} not found.`);
             }
 
             // Handle category setting for products page
             if (pageId === 'products-page') {
-                currentActiveCategory = category; // Set the global active category
-                if (productSearchInput) productSearchInput.value = ''; // Clear search on category change
-                filterProducts(); // Apply filters immediately
+                currentActiveCategory = category; 
+                if (productSearchInput) productSearchInput.value = ''; 
+                filterProducts(); 
             } else {
-                // If navigating away from products page, reset search and category filters
                 if (productSearchInput) productSearchInput.value = '';
-                currentActiveCategory = 'all'; // Reset global category
-                // Ensure all product cards are visible when leaving product pages
+                currentActiveCategory = 'all'; 
                 document.querySelectorAll('.product-card').forEach(card => {
                     card.style.display = 'block';
                 });
@@ -1202,21 +1086,9 @@
 
             // If navigating to cart page, render cart items
             if (pageId === 'cart-page') {
-                renderCartItems();
+                renderCartItems(); 
             } else if (pageId === 'transaction-menu-page') {
-                renderTransactionSummary();
-            } else if (pageId === 'order-history-page') {
-                if (loggedInUser) {
-                    renderOrderHistory(loggedInUser.uid);
-                } else {
-                    document.getElementById('order-history-container').innerHTML = '<p class="text-red-400 text-center text-lg">Please log in to view your order history.</p>';
-                }
-            } else if (pageId === 'admin-panel-page') {
-                // Reset admin panel view
-                document.getElementById('admin-login-section').classList.remove('hidden');
-                document.getElementById('admin-content-section').classList.add('hidden');
-                document.getElementById('admin-password').value = '';
-                document.getElementById('all-orders-container').innerHTML = '<p class="text-gray-400 text-center text-lg">No orders found.</p>';
+                renderTransactionSummary(); 
             }
 
             // Update active navigation link styling
@@ -1262,256 +1134,8 @@
                 });
         }
 
-        // Function to save order details to Firestore
-        async function saveOrderToFirestore(orderDetails) {
-            if (!loggedInUser || !firestoreDb) {
-                console.error("User not logged in or Firestore not initialized. Cannot save order.");
-                showToast("Login required to save order history.");
-                return;
-            }
-
-            const userId = loggedInUser.uid;
-            const userOrdersCollectionRef = window.firebaseFirestore.collection(firestoreDb, `artifacts/${currentAppId}/users/${userId}/orders`);
-            const publicOrdersCollectionRef = window.firebaseFirestore.collection(firestoreDb, `artifacts/${currentAppId}/public/data/all_orders`);
-
-            try {
-                // Save to user's private orders
-                await window.firebaseFirestore.addDoc(userOrdersCollectionRef, orderDetails);
-                console.log(`Order saved to user's history for ${userId}`);
-
-                // Save to public orders for admin panel (ensure sensitive data is handled appropriately if this were a real app)
-                await window.firebaseFirestore.addDoc(publicOrdersCollectionRef, {
-                    userId: userId,
-                    userName: loggedInUser.displayName || loggedInUser.email,
-                    userEmail: loggedInUser.email,
-                    ...orderDetails // Spread all order details
-                });
-                console.log("Order saved to public orders for admin panel.");
-                showToast("Order placed and saved to your history!");
-            } catch (error) {
-                console.error("Error saving order to Firestore:", error);
-                showToast("Order placed, but failed to save to history. Please contact support.");
-            }
-        }
-
-        // Google Sign-In Callback Function
-        window.handleCredentialResponse = async (response) => {
-            const loginModal = document.getElementById('login-modal');
-            const authStatusDiv = document.getElementById('auth-status');
-            const authButton = document.getElementById('auth-button');
-            const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
-            const loginRequiredMessage = document.getElementById('login-required-message');
-            const orderHistoryNav = document.getElementById('order-history-nav');
-            const mobileOrderHistoryNav = document.getElementById('mobile-order-history-nav');
-
-            try {
-                const credential = window.GoogleAuthProvider.credential(response.credential);
-                const result = await window.signInWithPopup(firebaseAuth, window.GoogleAuthProvider.credential(response.credential));
-                loggedInUser = result.user;
-
-                authStatusDiv.textContent = `Welcome, ${loggedInUser.displayName || loggedInUser.email}! User ID: ${loggedInUser.uid}`;
-                authButton.textContent = 'Logout';
-                authButton.onclick = logout;
-                loginModal.classList.add('hidden');
-                orderHistoryNav.classList.remove('hidden');
-                mobileOrderHistoryNav.classList.remove('hidden');
-
-                showToast(`Login successful! Welcome, ${loggedInUser.displayName || loggedInUser.email}!`);
-                await loadCartForUser(loggedInUser); // Load cart after successful login
-
-                // Update checkout button status based on cart and login
-                if (cartItems.length > 0) {
-                    proceedToCheckoutBtn.disabled = false;
-                    loginRequiredMessage.style.display = 'none';
-                } else {
-                    proceedToCheckoutBtn.disabled = true;
-                    loginRequiredMessage.style.display = 'block';
-                }
-
-            } catch (error) {
-                console.error('Google Sign-In Error:', error);
-                showToast('Google login failed. Please try again.');
-                loggedInUser = null;
-                authStatusDiv.textContent = 'Not logged in';
-                authButton.textContent = 'Login';
-                authButton.onclick = () => loginModal.classList.remove('hidden');
-                proceedToCheckoutBtn.disabled = true;
-                loginRequiredMessage.style.display = 'block';
-                orderHistoryNav.classList.add('hidden');
-                mobileOrderHistoryNav.classList.add('hidden');
-            }
-        };
-
-        // Function to handle logout
-        const logout = async () => {
-            const authStatusDiv = document.getElementById('auth-status');
-            const authButton = document.getElementById('auth-button');
-            const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
-            const loginRequiredMessage = document.getElementById('login-required-message');
-            const orderHistoryNav = document.getElementById('order-history-nav');
-            const mobileOrderHistoryNav = document.getElementById('mobile-order-history-nav');
-
-            try {
-                await window.signOut(firebaseAuth);
-                loggedInUser = null;
-                cartItems = []; // Clear the current cart items in memory
-
-                // Revoke Google session (prevents auto-login on next visit if user logs out)
-                if (google.accounts.id) {
-                    google.accounts.id.disableAutoSelect();
-                }
-                
-                // Reset UI
-                authStatusDiv.textContent = 'Not logged in';
-                authButton.textContent = 'Login';
-                authButton.onclick = () => document.getElementById('login-modal').classList.remove('hidden'); // Re-assign click handler
-                orderHistoryNav.classList.add('hidden');
-                mobileOrderHistoryNav.classList.add('hidden');
-
-                renderCartItems(); // Re-render cart to show empty state
-                updateCartCount(); // Update cart count to 0
-
-                proceedToCheckoutBtn.disabled = true; // Disable checkout button
-                loginRequiredMessage.style.display = 'block'; // Show login message
-
-                showToast('Logged out successfully!');
-            } catch (error) {
-                console.error("Error during logout:", error);
-                showToast("Failed to log out. Please try again.");
-            }
-        };
-
-        // Function to render order history for the logged-in user
-        const renderOrderHistory = async (userId) => {
-            const orderHistoryContainer = document.getElementById('order-history-container');
-            const noOrdersMessage = document.getElementById('no-orders-message');
-
-            if (!orderHistoryContainer || !noOrdersMessage) {
-                console.warn("Order history elements not found.");
-                return;
-            }
-
-            orderHistoryContainer.innerHTML = ''; // Clear existing content
-            orderHistoryContainer.appendChild(noOrdersMessage); // Re-add message initially
-
-            if (!userId || !firestoreDb) {
-                noOrdersMessage.textContent = "Please log in to view your order history.";
-                noOrdersMessage.style.display = 'block';
-                return;
-            }
-
-            try {
-                const ordersCollectionRef = window.firebaseFirestore.collection(firestoreDb, `artifacts/${currentAppId}/users/${userId}/orders`);
-                const q = window.firebaseFirestore.query(ordersCollectionRef); // No orderBy to avoid index issues
-
-                const querySnapshot = await window.firebaseFirestore.getDocs(q);
-                const orders = [];
-                querySnapshot.forEach((doc) => {
-                    orders.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (orders.length === 0) {
-                    noOrdersMessage.textContent = "You have no past orders.";
-                    noOrdersMessage.style.display = 'block';
-                } else {
-                    noOrdersMessage.style.display = 'none';
-                    // Sort orders by date in descending order (most recent first)
-                    orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-
-                    orders.forEach(order => {
-                        const orderElement = document.createElement('div');
-                        orderElement.classList.add('bg-gray-700', 'rounded-lg', 'shadow-md', 'p-4', 'mb-4');
-                        orderElement.innerHTML = `
-                            <h4 class="text-xl font-semibold text-blue-300 mb-2">Order ID: ${order.id}</h4>
-                            <p class="text-gray-300 mb-1">Date: ${order.orderDate}</p>
-                            <p class="text-gray-300 mb-1">Total: ₹${order.totalAmount.toLocaleString('en-IN')}</p>
-                            <p class="text-gray-300 mb-2">Status: <span class="${order.paymentStatus === 'Paid' ? 'text-green-400' : 'text-yellow-400'}">${order.paymentStatus}</span></p>
-                            <div class="mt-2 border-t border-gray-600 pt-2">
-                                <p class="text-gray-200 font-medium">Items:</p>
-                                <ul class="list-disc list-inside text-gray-400">
-                                    ${order.cartItems.map(item => `<li>${item.name} (x${item.quantity}) - ₹${item.price.toLocaleString('en-IN')}</li>`).join('')}
-                                </ul>
-                            </div>
-                            <div class="mt-2 border-t border-gray-600 pt-2">
-                                <p class="text-gray-200 font-medium">Shipping Address:</p>
-                                <p class="text-gray-400">${order.fullName}</p>
-                                <p class="text-gray-400">${order.addressLine1}${order.addressLine2 ? ', ' + order.addressLine2 : ''}</p>
-                                <p class="text-gray-400">${order.city}, ${order.state} - ${order.pincode}</p>
-                                <p class="text-gray-400">Phone: ${order.phoneNumber}</p>
-                            </div>
-                        `;
-                        orderHistoryContainer.appendChild(orderElement);
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching order history:", error);
-                noOrdersMessage.textContent = "Failed to load order history. Please try again.";
-                noOrdersMessage.style.display = 'block';
-            }
-        };
-
-        // Function to render all orders for the admin panel
-        const renderAdminOrders = async () => {
-            const allOrdersContainer = document.getElementById('all-orders-container');
-            if (!allOrdersContainer) {
-                console.warn("Admin orders container not found.");
-                return;
-            }
-
-            allOrdersContainer.innerHTML = '<p class="text-gray-400 text-center text-lg">Loading orders...</p>';
-
-            try {
-                const publicOrdersCollectionRef = window.firebaseFirestore.collection(firestoreDb, `artifacts/${currentAppId}/public/data/all_orders`);
-                const q = window.firebaseFirestore.query(publicOrdersCollectionRef); // No orderBy to avoid index issues
-
-                const querySnapshot = await window.firebaseFirestore.getDocs(q);
-                const orders = [];
-                querySnapshot.forEach((doc) => {
-                    orders.push({ id: doc.id, ...doc.data() });
-                });
-
-                if (orders.length === 0) {
-                    allOrdersContainer.innerHTML = '<p class="text-gray-400 text-center text-lg">No orders found.</p>';
-                } else {
-                    allOrdersContainer.innerHTML = ''; // Clear loading message
-                    // Sort orders by date in descending order (most recent first)
-                    orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-
-                    orders.forEach(order => {
-                        const orderElement = document.createElement('div');
-                        orderElement.classList.add('bg-gray-700', 'rounded-lg', 'shadow-md', 'p-4', 'mb-4');
-                        orderElement.innerHTML = `
-                            <h4 class="text-xl font-semibold text-blue-300 mb-2">Order ID: ${order.id}</h4>
-                            <p class="text-gray-300 mb-1">User ID: <span class="text-white">${order.userId}</span></p>
-                            <p class="text-gray-300 mb-1">Customer Name: <span class="text-white">${order.fullName}</span></p>
-                            <p class="text-gray-300 mb-1">Google Email: <span class="text-white">${order.userEmail || 'N/A'}</span></p>
-                            <p class="text-gray-300 mb-1">Order Date: ${order.orderDate}</p>
-                            <p class="text-gray-300 mb-1">Total Amount: ₹${order.totalAmount.toLocaleString('en-IN')}</p>
-                            <p class="text-gray-300 mb-2">Payment Status: <span class="${order.paymentStatus === 'Paid' ? 'text-green-400' : 'text-yellow-400'}">${order.paymentStatus}</span></p>
-                            <div class="mt-2 border-t border-gray-600 pt-2">
-                                <p class="text-gray-200 font-medium">Items:</p>
-                                <ul class="list-disc list-inside text-gray-400">
-                                    ${order.cartItems.map(item => `<li>${item.name} (x${item.quantity}) - ₹${item.price.toLocaleString('en-IN')}</li>`).join('')}
-                                </ul>
-                            </div>
-                            <div class="mt-2 border-t border-gray-600 pt-2">
-                                <p class="text-gray-200 font-medium">Shipping Address:</p>
-                                <p class="text-gray-400">${order.addressLine1}${order.addressLine2 ? ', ' + order.addressLine2 : ''}</p>
-                                <p class="text-gray-400">${order.city}, ${order.state} - ${order.pincode}</p>
-                                <p class="text-gray-400">Phone: ${order.phoneNumber}</p>
-                            </div>
-                        `;
-                        allOrdersContainer.appendChild(orderElement);
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching all orders for admin panel:", error);
-                allOrdersContainer.innerHTML = '<p class="text-red-400 text-center text-lg">Failed to load orders for admin panel. Please check console for errors.</p>';
-            }
-        };
-
         // --- DOMContentLoaded listener and event attachments ---
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const navLinks = document.querySelectorAll('.nav-link');
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -1520,11 +1144,10 @@
             const productSearchInput = document.getElementById('product-search-input');
             const cartItemsContainer = document.getElementById('cart-items-container');
 
-            // Transaction page elements
+            // Cart and Transaction page elements
             const proceedToCheckoutBtn = document.getElementById('proceed-to-checkout-btn');
             const continueToPaymentBtn = document.getElementById('continue-to-payment-btn');
             const backToCartBtn = document.getElementById('back-to-cart-btn');
-            const loginRequiredMessage = document.getElementById('login-required-message');
             
             // Address input fields
             const fullNameInput = document.getElementById('full-name');
@@ -1541,50 +1164,28 @@
             const closeModalBtn = document.getElementById('close-modal-btn');
             const acknowledgeModalBtn = document.getElementById('acknowledge-modal-btn');
 
-            // Login modal elements
-            const loginModal = document.getElementById('login-modal');
-            const closeLoginModalBtn = document.getElementById('close-login-modal-btn');
-            const authButton = document.getElementById('auth-button');
-            const authStatusDiv = document.getElementById('auth-status');
-            const orderHistoryNav = document.getElementById('order-history-nav');
-            const mobileOrderHistoryNav = document.getElementById('mobile-order-history-nav');
+            // --- Price Modification Logic ---
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                const originalPriceSpan = card.querySelector('.original-price');
+                const discountedPriceSpan = card.querySelector('.discounted-price');
+                const addToCartButton = card.querySelector('.add-to-cart');
 
-            // Admin panel elements
-            const adminLoginSection = document.getElementById('admin-login-section');
-            const adminContentSection = document.getElementById('admin-content-section');
-            const adminPasswordInput = document.getElementById('admin-password');
-            const adminLoginBtn = document.getElementById('admin-login-btn');
+                if (originalPriceSpan && discountedPriceSpan && addToCartButton) {
+                    let currentPrice = parseFloat(addToCartButton.dataset.price); 
+                    
+                    let doubledPrice = currentPrice * 2; 
+                    let finalPrice = currentPrice; 
 
-            // Initialize Firebase instances from global window object
-            firestoreDb = window.firebaseDb;
-            firebaseAuth = window.firebaseAuth;
-            currentAppId = window.appId;
-
-            // Handle Firebase Auth state changes
-            window.onAuthStateChanged(firebaseAuth, async (user) => {
-                loggedInUser = user;
-                if (user) {
-                    authStatusDiv.textContent = `Welcome, ${user.displayName || user.email}! User ID: ${user.uid}`;
-                    authButton.textContent = 'Logout';
-                    authButton.onclick = logout;
-                    proceedToCheckoutBtn.disabled = false; // Enable checkout button
-                    loginRequiredMessage.style.display = 'none'; // Hide login message
-                    orderHistoryNav.classList.remove('hidden');
-                    mobileOrderHistoryNav.classList.remove('hidden');
-                    await loadCartForUser(user); // Load cart for the logged-in user
-                } else {
-                    authStatusDiv.textContent = 'Not logged in';
-                    authButton.textContent = 'Login';
-                    authButton.onclick = () => loginModal.classList.remove('hidden');
-                    proceedToCheckoutBtn.disabled = true; // Disable checkout button
-                    loginRequiredMessage.style.display = 'block'; // Show login message
-                    orderHistoryNav.classList.add('hidden');
-                    mobileOrderHistoryNav.classList.add('hidden');
-                    cartItems = []; // Clear cart if logged out
-                    renderCartItems(); // Update cart display
-                    updateCartCount(); // Update cart count to 0
+                    originalPriceSpan.textContent = doubledPrice.toLocaleString('en-IN');
+                    discountedPriceSpan.textContent = finalPrice.toLocaleString('en-IN');
+                    addToCartButton.dataset.price = finalPrice; 
                 }
             });
+            // --- End Price Modification Logic ---
+
+            // Load cart on page load
+            loadCart();
 
             // Show welcome modal if not dismissed before
             if (localStorage.getItem('welcomeModalDismissed') !== 'true') {
@@ -1602,19 +1203,11 @@
                 localStorage.setItem('welcomeModalDismissed', 'true');
             });
 
-            // Login modal close button
-            closeLoginModalBtn.addEventListener('click', () => {
-                loginModal.classList.add('hidden');
-            });
-
             // Event listeners for navigation links
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
-                    e.preventDefault(); // Prevent default link behavior
+                    e.preventDefault(); 
                     const page = link.dataset.page;
-                    if (page === 'products') {
-                        currentActiveCategory = 'all';
-                    }
                     showPage(`${page}-page`);
                     // Close mobile menu if open
                     if (!mobileMenu.classList.contains('hidden')) {
@@ -1645,8 +1238,8 @@
             // Product filtering functionality (buttons on products page)
             filterButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    currentActiveCategory = button.dataset.category; // Update global active category
-                    filterProducts(); // Re-filter products based on new category and current search
+                    currentActiveCategory = button.dataset.category; 
+                    filterProducts(); 
                 });
             });
 
@@ -1657,26 +1250,27 @@
 
             // Add to Cart button event listeners
             document.querySelectorAll('.add-to-cart').forEach(button => {
-                button.addEventListener('click', async (e) => {
+                button.addEventListener('click', (e) => {
                     const productName = e.target.dataset.name;
                     const productPrice = parseFloat(e.target.dataset.price);
-                    await addItemToCart(productName, productPrice);
+                    addItemToCart(productName, productPrice);
                 });
             });
 
             // Event delegation for quantity and remove buttons in cart
             if (cartItemsContainer) {
-                cartItemsContainer.addEventListener('click', async (e) => {
-                    // Check if the clicked element or its parent is a quantity button
+                cartItemsContainer.addEventListener('click', (e) => {
+                    console.log("Cart items container clicked!", e.target); // New log
                     const quantityBtn = e.target.closest('.quantity-btn');
                     if (quantityBtn) {
-                        const itemName = quantityBtn.dataset.name.trim(); // Trim name for consistency
+                        const itemName = quantityBtn.dataset.name.trim(); 
                         const action = quantityBtn.dataset.action;
                         let itemToUpdate = cartItems.find(item => item.name === itemName);
 
                         if (itemToUpdate) {
+                            console.log(`Before update - Item: ${itemName}, Quantity: ${itemToUpdate.quantity}`); // New log
                             if (action === 'increase') {
-                                if (itemToUpdate.quantity < MAX_PRODUCT_QUANTITY) { // Enforce max limit
+                                if (itemToUpdate.quantity < MAX_PRODUCT_QUANTITY) { 
                                     itemToUpdate.quantity++;
                                     showToast(`${itemName} quantity increased to ${itemToUpdate.quantity}!`);
                                 } else {
@@ -1694,26 +1288,26 @@
                                     }
                                 }
                             }
-                            // Always re-render the cart after any quantity change or removal to ensure UI consistency
-                            renderCartItems(); // This call should update the numbers
+                            console.log(`After update - Item: ${itemName}, Quantity: ${itemToUpdate ? itemToUpdate.quantity : 'removed'}`); // New log
+                            renderCartItems(); 
                             updateCartCount();
                             calculateCartTotals();
-                            await saveCartToFirestore(); // Save cart after modification
+                            saveCart(); 
                         } else {
                             console.warn(`Attempted to update quantity for non-existent item: ${itemName}. Re-rendering cart.`);
-                            renderCartItems(); // Fallback to full re-render if item not found (e.g., after removal)
+                            renderCartItems(); 
                             updateCartCount();
                         }
                     } else if (e.target.closest('.remove-item-btn')) {
-                        const itemName = e.target.closest('.remove-item-btn').dataset.name.trim(); // Trim name for consistency
+                        const itemName = e.target.closest('.remove-item-btn').dataset.name.trim(); 
                         const indexToRemove = cartItems.findIndex(item => item.name === itemName);
                         if (indexToRemove !== -1) {
-                            cartItems.splice(indexToRemove, 1); // Remove item from array
+                            cartItems.splice(indexToRemove, 1); 
                             showToast(`${itemName} removed from cart.`);
                         }
-                        renderCartItems(); // Re-render cart after removal
+                        renderCartItems(); 
                         updateCartCount();
-                        await saveCartToFirestore(); // Save cart after modification
+                        saveCart(); 
                     }
                 });
             }
@@ -1722,19 +1316,9 @@
             // Event listener for Proceed to Checkout button
             if (proceedToCheckoutBtn) {
                 proceedToCheckoutBtn.addEventListener('click', () => {
-                    if (!loggedInUser) {
-                        showToast("Please log in with Google to proceed to checkout.");
-                        loginModal.classList.remove('hidden'); // Show login modal
-                        return;
-                    }
                     if (cartItems.length === 0) {
                         showToast("Your cart is empty. Please add items before proceeding to checkout.");
-                        return; // Prevent navigating if cart is empty
-                    }
-                    // Prefill email and full name if logged in
-                    if (loggedInUser) {
-                        fullNameInput.value = loggedInUser.displayName || '';
-                        emailInput.value = loggedInUser.email || '';
+                        return; 
                     }
                     showPage('transaction-menu-page');
                 });
@@ -1747,7 +1331,7 @@
                     const fullName = fullNameInput.value.trim();
                     const email = emailInput.value.trim();
                     const addressLine1 = addressLine1Input.value.trim();
-                    const addressLine2 = addressLine2Input.value.trim(); // Keep for email
+                    const addressLine2 = addressLine2Input.value.trim(); 
                     const city = cityInput.value.trim();
                     const state = stateInput.value.trim();
                     const pincode = pincodeInput.value.trim();
@@ -1791,18 +1375,18 @@
                         shippingCost: SHIPPING_CHARGE,
                         totalAmount: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0) + SHIPPING_CHARGE,
                         orderDate: new Date().toLocaleString(),
-                        paymentStatus: 'Pending' // Initial status
+                        paymentStatus: 'Pending' 
                     };
 
-                    const razorpayAmount = orderDetails.totalAmount * 100; // Amount in paise
+                    const razorpayAmount = orderDetails.totalAmount * 100; 
 
                     const options = {
-                        key: "rzp_test_ZxlY5x1fQ5Axse", // Your Razorpay Key - UPDATE THIS IF YOU HAVE A DIFFERENT KEY
+                        key: "rzp_test_ZxlY5x1fQ5Axse", 
                         amount: razorpayAmount,
                         currency: "INR",
                         name: "Inkémon",
                         description: "Order from Inkémon",
-                        handler: async function (response) {
+                        handler: function (response) {
                             console.log("Payment success", response);
                             // Update payment status to successful
                             orderDetails.paymentStatus = 'Paid';
@@ -1812,15 +1396,14 @@
 
                             // Send email on successful payment
                             sendEmail(orderDetails);
-                            // Save order details to Firestore
-                            await saveOrderToFirestore(orderDetails);
                             
                             // Clear cart and redirect after successful payment and email attempt
                             cartItems = [];
-                            await saveCartToFirestore(); // Save empty cart for the user
+                            saveCart(); 
                             updateCartCount();
-                            renderCartItems();
-                            showPage('home-page');
+                            // No need to renderCartItems here, as we are navigating away
+                            showToast('Payment successful! Your order has been placed.');
+                            showPage('home-page'); // Redirect to home page
                         },
                         prefill: {
                             name: orderDetails.fullName,
@@ -1833,8 +1416,6 @@
                         modal: {
                             ondismiss: function() {
                                 showToast('Payment was cancelled or failed. Please try again.');
-                                // Optionally, send orderDetails with 'Cancelled' status to backend here (if you were using backend for orders)
-                                // For now, no action needed on dismiss if not saving to DB.
                             }
                         }
                     };
@@ -1851,51 +1432,23 @@
                 });
             }
 
-            // Admin Panel Login
-            if (adminLoginBtn) {
-                adminLoginBtn.addEventListener('click', async () => {
-                    const password = adminPasswordInput.value;
-                    const correctPassword = "rudsatpra123"; // Admin password
+            // Initial page setup:
+            // The home-page is already set to 'active' in HTML, so it's visible by default.
+            // We just need to ensure other pages are hidden and the home nav link is active.
+            document.querySelectorAll('.page-section:not(#home-page)').forEach(section => {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
 
-                    if (password === correctPassword) {
-                        adminLoginSection.classList.add('hidden');
-                        adminContentSection.classList.remove('hidden');
-                        showToast("Admin login successful!");
-                        await renderAdminOrders();
-                    } else {
-                        showToast("Incorrect admin password.");
-                        adminPasswordInput.value = ''; // Clear password
-                    }
-                });
+            // Set the 'Home' navigation link as active on initial load
+            const homeNavLink = document.querySelector('.nav-link[data-page="home"]');
+            if (homeNavLink) {
+                homeNavLink.classList.add('bg-blue-600', 'text-white');
+                homeNavLink.classList.remove('bg-gray-800', 'text-gray-300');
             }
 
-            // Initialize to show the home page and set active link
-            showPage('home-page');
             updateCartCount(); // Initialize cart count on load
         });
     </script>
-    <!-- Firestore Security Rules for Firebase Console:
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        // User-specific carts
-        match /artifacts/{appId}/users/{userId}/carts/{document=**} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
-        }
-
-        // User-specific orders (history)
-        match /artifacts/{appId}/users/{userId}/orders/{document=**} {
-          allow read: if request.auth != null && request.auth.uid == userId;
-          allow write: if request.auth != null && request.auth.uid == userId; // Allow write for adding new orders
-        }
-
-        // Public orders for admin panel (read-only for authenticated users)
-        match /artifacts/{appId}/public/data/all_orders/{document=**} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null; // Allow write for new orders
-        }
-      }
-    }
-    -->
 </body>
 </html>
