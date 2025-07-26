@@ -292,8 +292,7 @@
 
                             </svg>
                         </div>
-                    
-                    </div>
+                                            </div>
                 </div>
             </div>
         </section>
@@ -853,7 +852,7 @@
                                 <span class="text-blue-400">Total:</span>
                                 <span class="text-white">₹<span id="cart-total">0</span></span>
                             </div>
-                            
+        
                         </div>
                         <button id="proceed-to-checkout-btn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md mt-8 text-lg font-semibold">Proceed to Checkout</button>
                     </div>
@@ -1122,7 +1121,7 @@
             <p class="modal-text">
                 Please note: We currently only ship orders on <strong>Saturdays</strong>.
                 Kindly place your orders accordingly to ensure timely processing.<br>
-                Currently, all methods of payment are available.
+                Currently, <strong>all types of payment methods are available.</strong>
             </p>
             <button id="acknowledge-modal-btn" class="modal-action-btn">
                 Got It!
@@ -1501,21 +1500,31 @@
             // Load cart on page load
             loadCart();
 
-            // Show welcome modal if not dismissed before
-            if (localStorage.getItem('welcomeModalDismissed') !== 'true') {
+            // --- MODIFIED TO ALWAYS SHOW POP-UP ---
+            // The original logic to hide the pop-up after one view has been commented out for testing.
+            // The pop-up will now appear every time the page loads.
+            if (welcomeModal) {
                 welcomeModal.classList.remove('hidden');
             }
-
+            
             // Close welcome modal event listeners
-            closeModalBtn.addEventListener('click', () => {
-                welcomeModal.classList.add('hidden');
-                localStorage.setItem('welcomeModalDismissed', 'true');
-            });
+            if(closeModalBtn) {
+                closeModalBtn.addEventListener('click', () => {
+                    if (welcomeModal) {
+                        welcomeModal.classList.add('hidden');
+                    }
+                    // localStorage.setItem('welcomeModalDismissed', 'true'); // This line is commented out
+                });
+            }
 
-            acknowledgeModalBtn.addEventListener('click', () => {
-                welcomeModal.classList.add('hidden');
-                localStorage.setItem('welcomeModalDismissed', 'true');
-            });
+            if(acknowledgeModalBtn) {
+                acknowledgeModalBtn.addEventListener('click', () => {
+                    if (welcomeModal) {
+                        welcomeModal.classList.add('hidden');
+                    }
+                    // localStorage.setItem('welcomeModalDismissed', 'true'); // This line is commented out
+                });
+            }
 
             // Event listeners for navigation links
             navLinks.forEach(link => {
@@ -1763,6 +1772,6 @@
 
             updateCartCount(); // Initialize cart count on load
         });
-    </script>
+   </script>
 </body>
 </html>
